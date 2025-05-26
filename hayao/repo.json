@@ -1,0 +1,10 @@
+{
+    "name": "hayao",
+    "maintainer": "hayao <shun819.mail at gmail.com>",
+    "server": "https://repo.vps-1.skr.hayao0819.com/repo/hayao/x86_64",
+    "installpkgs": {
+        "names": [
+            "git"
+        ]
+    }
+}

@@ -1,0 +1,15 @@
+[submodule "hayao/yay"]
+	path = hayao/yay
+	url = https://aur.archlinux.org/yay
+[submodule "hayao/otf-source-han-code-jp"]
+	path = hayao/otf-source-han-code-jp
+	url = https://aur.archlinux.org/otf-source-han-code-jp
+[submodule "hayao/zig-git"]
+	path = hayao/zig-git
+	url = https://aur.archlinux.org/zig-git
+[submodule "hayao/scala"]
+	path = hayao/scala
+	url = https://aur.archlinux.org/scala
+[submodule "hayao/qt5-styleplugins"]
+	path = hayao/qt5-styleplugins
+	url = https://aur.archlinux.org/qt5-styleplugins
