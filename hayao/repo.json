@@ -1,10 +1,12 @@
 {
     "name": "hayao",
     "maintainer": "hayao <shun819.mail at gmail.com>",
-    "server": "https://repo.vps-1.skr.hayao0819.com/repo/hayao/x86_64",
-    "installpkgs": {
-        "names": [
-            "git"
-        ]
-    }
+    "build": {
+        "repos": [
+            { "name": "hayao", "server": "https://repo.vps-1.skr.hayao0819.com/repo/$repo/$arch" }
+        ],
+        "arches": ["x86_64"],
+        "image": "ghcr.io/hayao0819/archlinux:$arch"
+    },
+    "installpkgs": { "files": [], "names": [] }
 }

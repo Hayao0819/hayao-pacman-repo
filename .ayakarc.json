@@ -1,4 +1,5 @@
 {
-    "repodir": "./hayao",
-    "destdir": "./out"
+    "repos": [
+        { "dir": "./hayao", "destdir": "./out" }
+    ]
 }

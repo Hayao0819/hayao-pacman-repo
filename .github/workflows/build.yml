@@ -1,0 +1,151 @@
+name: Build and publish
+
+on:
+  push:
+    branches: [master]
+    paths: ["hayao/**"]
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: "Force-build these packages (space-separated). Empty = build what ayaka plan selects."
+        required: false
+        default: ""
+      all:
+        description: "Force-rebuild every package regardless of version (recovery/rebuild; normal first run needs nothing here)."
+        type: boolean
+        required: false
+        default: false
+
+# ayaka bump pushes pkgrel bumps for cascaded rebuilds back to master.
+permissions:
+  contents: write
+
+# Serialize runs so a bump push cannot race another run's checkout.
+concurrency:
+  group: build-${{ github.ref }}
+
+jobs:
+  # ayaka matrix computes per {repo, arch} what to build (version diff +
+  # makedepends cascade), which packages need a pkgrel bump because they rebuild
+  # without a source change, and cost buckets that never split a dependency
+  # component.
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      build_matrix: ${{ steps.gen.outputs.build_matrix }}
+      prune_matrix: ${{ steps.gen.outputs.prune_matrix }}
+      bumps: ${{ steps.gen.outputs.bumps }}
+      any_build: ${{ steps.gen.outputs.any_build }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - uses: actions/setup-go@v7
+        with:
+          go-version: "1.x"
+          cache: false
+      - uses: Hayao0819/Kamisato/actions/install@b23366f68481af835fc0f624240712dd88c7cf78 # master
+        with:
+          ayaka: "true"
+          version: b23366f68481af835fc0f624240712dd88c7cf78
+      - id: gen
+        uses: Hayao0819/Kamisato/actions/plan@b23366f68481af835fc0f624240712dd88c7cf78 # master
+        with:
+          server: ${{ vars.AYATO_URL }}
+          packages: ${{ github.event.inputs.packages }}
+          all: ${{ github.event.inputs.all }}
+          workers: 4
+
+  # Cascaded rebuilds carry no source change of their own, so their pkgrel is
+  # bumped and pushed before the builds; the build jobs check out that commit.
+  # makepkg (for .SRCINFO regen) needs Arch tooling and refuses root, hence the
+  # container (the bump action drops to an unprivileged user itself).
+  bump:
+    needs: plan
+    if: needs.plan.outputs.bumps != '{}'
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    outputs:
+      sha: ${{ steps.bump.outputs.sha }}
+    steps:
+      - name: Install tooling
+        run: pacman -Syu --noconfirm base-devel git go sudo jq
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - uses: Hayao0819/Kamisato/actions/install@b23366f68481af835fc0f624240712dd88c7cf78 # master
+        with:
+          ayaka: "true"
+          version: b23366f68481af835fc0f624240712dd88c7cf78
+      - id: bump
+        uses: Hayao0819/Kamisato/actions/bump@b23366f68481af835fc0f624240712dd88c7cf78 # master
+        with:
+          bumps: ${{ needs.plan.outputs.bumps }}
+
+  # One job per plan bucket. Within a bucket ayaka builds dependencies first and
+  # --publish uploads each package right after it is built, so a later chroot in
+  # the same bucket pulls the fresh dependency from ayato via repo.json
+  # build.repos.
+  build:
+    needs: [plan, bump]
+    if: always() && needs.plan.result == 'success' && needs.plan.outputs.any_build == 'true' && (needs.bump.result == 'success' || needs.bump.result == 'skipped')
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.build_matrix) }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.bump.outputs.sha || github.sha }}
+          submodules: recursive
+          fetch-depth: 0
+      - uses: actions/setup-go@v7
+        with:
+          go-version: "1.x"
+          cache: false
+      - uses: Hayao0819/Kamisato/actions/install@b23366f68481af835fc0f624240712dd88c7cf78 # master
+        with:
+          ayaka: "true"
+          version: b23366f68481af835fc0f624240712dd88c7cf78
+      - name: Build and publish packages
+        uses: Hayao0819/Kamisato/actions/build@b23366f68481af835fc0f624240712dd88c7cf78 # master
+        with:
+          server: ${{ vars.AYATO_URL }}
+          repo: ${{ matrix.repo }}
+          arch: ${{ matrix.arch }}
+          pkgs: ${{ matrix.pkgs }}
+          api_key: ${{ secrets.AYATO_TOKEN }}
+
+  # Runs even when nothing was built: a removed PKGBUILD produces no new package
+  # but its old one must still be pruned from ayato.
+  prune:
+    needs: [plan, bump, build]
+    if: always() && needs.plan.result == 'success' && needs.build.result != 'failure' && needs.build.result != 'cancelled'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.prune_matrix) }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.bump.outputs.sha || github.sha }}
+          submodules: recursive
+          fetch-depth: 0
+      - uses: actions/setup-go@v7
+        with:
+          go-version: "1.x"
+          cache: false
+      - uses: Hayao0819/Kamisato/actions/install@b23366f68481af835fc0f624240712dd88c7cf78 # master
+        with:
+          ayaka: "true"
+          version: b23366f68481af835fc0f624240712dd88c7cf78
+      - name: Prune removed packages
+        uses: Hayao0819/Kamisato/actions/prune@b23366f68481af835fc0f624240712dd88c7cf78 # master
+        with:
+          server: ${{ vars.AYATO_URL }}
+          repo: ${{ matrix.repo }}
+          arch: ${{ matrix.arch }}
+          api_key: ${{ secrets.AYATO_TOKEN }}

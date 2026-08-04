@@ -1,0 +1,22 @@
+name: Update upstream versions
+
+on:
+  schedule:
+    - cron: "0 4 * * *"
+  workflow_dispatch: {}
+
+# The update commit is pushed with GITHUB_TOKEN, which never fires on:push, so
+# the update workflow dispatches build.yml itself (hence actions: write).
+permissions:
+  contents: write
+  actions: write
+
+# Share the build group so an update never races a bump push from a build run.
+concurrency:
+  group: build-refs/heads/master
+
+jobs:
+  update:
+    uses: Hayao0819/Kamisato/.github/workflows/upstream-update.yml@b23366f68481af835fc0f624240712dd88c7cf78 # master
+    with:
+      version: b23366f68481af835fc0f624240712dd88c7cf78
