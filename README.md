@@ -28,4 +28,4 @@ AUR由来のsubmoduleは毎日の `update.yml` がAUR RPCと照合して自動�
 
 ## ビルド
 
-masterへのpushを契機に `build.yml` が差分をビルドしてayatoへpublishします。ローカルでビルドする場合はayakaを入れて `./hayao.sh build` を実行します。
+masterへのpushを契機に `build.yml` が差分をビルドしてayatoへpublishします。ローカルでビルドする場合はayakaを入れて `ayaka build hayao` を実行します。
