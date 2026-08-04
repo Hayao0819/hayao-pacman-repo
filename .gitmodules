@@ -13,3 +13,6 @@
 [submodule "hayao/qt5-styleplugins"]
 	path = hayao/qt5-styleplugins
 	url = https://aur.archlinux.org/qt5-styleplugins
+[submodule "hayao/gtk2"]
+	path = hayao/gtk2
+	url = https://aur.archlinux.org/gtk2
