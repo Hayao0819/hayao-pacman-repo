@@ -1,0 +1,20 @@
+platform/x86: dell-wmi: ignore type 0x0012 code 0x0000 events
+
+The Dell XPS 13 9350 (2024) emits WMI events with type 0x0012 and
+code 0x0000 (observed together with a dell-privacy 0x0037 event),
+producing 'Unknown key' log noise. Ignore them.
+---
+diff --git a/drivers/platform/x86/dell/dell-wmi-base.c b/drivers/platform/x86/dell/dell-wmi-base.c
+index 997383ba1846..f883cc40dec9 100644
+--- a/drivers/platform/x86/dell/dell-wmi-base.c
++++ b/drivers/platform/x86/dell/dell-wmi-base.c
+@@ -369,6 +369,9 @@ static const struct key_entry dell_wmi_keymap_type_0011[] = {
+  * They are events with extended data
+  */
+ static const struct key_entry dell_wmi_keymap_type_0012[] = {
++	/* Unmapped system event, seen on XPS 13 9350 (2024) */
++	{ KE_IGNORE, 0x0000, { KEY_RESERVED } },
++
+ 	/* Backlight brightness change event */
+ 	{ KE_IGNORE, 0x0003, { KEY_RESERVED } },
+ 

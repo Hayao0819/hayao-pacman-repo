@@ -1,0 +1,54 @@
+usb: typec: ucsi: retry re-enabling notifications after resume
+
+On the Dell XPS 13 9350 (2024, Lunar Lake) the PPM does not respond to
+UCSI_SET_NOTIFICATION_ENABLE for several seconds after s2idle resume:
+every single resume logs
+
+  ucsi_acpi USBC000:00: failed to re-enable notifications (-110)
+
+exactly one command timeout after "PM: suspend exit" (20/20 resumes in
+the journal of one boot). ucsi_resume_work() gives up on the first
+failure, leaving the notification mask disabled and skipping the
+connector re-check.
+
+Retry the command a couple of times before giving up. Each attempt
+already blocks for the command timeout, so this adds no delay in the
+success case and only bounded extra wait when the PPM is slow to wake.
+
+--- a/drivers/usb/typec/ucsi/ucsi.c
+---
+diff --git a/drivers/usb/typec/ucsi/ucsi.c b/drivers/usb/typec/ucsi/ucsi.c
+index 49f1c53721bb..c1517a0a46ef 100644
+--- a/drivers/usb/typec/ucsi/ucsi.c
++++ b/drivers/usb/typec/ucsi/ucsi.c
+@@ -2159,16 +2159,25 @@ static void ucsi_resume_work(struct work_struct *work)
+ {
+ 	struct ucsi *ucsi = container_of(work, struct ucsi, resume_work);
+ 	struct ucsi_connector *con;
++	unsigned int attempts = 0;
+ 	u64 command;
+ 	int ret;
+ 
+ 	/* Restore UCSI notification enable mask after system resume */
+ 	command = UCSI_SET_NOTIFICATION_ENABLE | ucsi->ntfy;
+-	ret = ucsi_send_command(ucsi, command, NULL, 0);
+-	if (ret < 0) {
+-		dev_err(ucsi->dev, "failed to re-enable notifications (%d)\n", ret);
+-		return;
+-	}
++	do {
++		ret = ucsi_send_command(ucsi, command, NULL, 0);
++		if (ret >= 0)
++			break;
++		/*
++		 * Some PPMs take seconds after s2idle resume to accept
++		 * commands; each attempt already waits the command timeout.
++		 */
++		if (ret != -ETIMEDOUT || ++attempts == 3) {
++			dev_err(ucsi->dev, "failed to re-enable notifications (%d)\n", ret);
++			return;
++		}
++	} while (true);
+ 
+ 	for (con = ucsi->connector; con->port; con++) {
+ 		mutex_lock(&con->lock);
