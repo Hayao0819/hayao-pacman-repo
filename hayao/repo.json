@@ -6,7 +6,8 @@
             { "name": "hayao", "server": "https://repo.vps-1.skr.hayao0819.com/repo/$repo/$arch" }
         ],
         "arches": ["x86_64"],
-        "image": "ghcr.io/hayao0819/archlinux:$arch"
+        "image": "ghcr.io/hayao0819/archlinux:$arch",
+        "timeout": "5h"
     },
     "installpkgs": { "files": [], "names": [] }
 }
