@@ -19,9 +19,17 @@ makedepends=(
   xz
 )
 options=(!debug !strip)
-_srcname=linux-${pkgver/rc/-rc}
+# Release tarballs live on cdn.kernel.org; -rc only exists as a git snapshot.
+if [[ $pkgver == *rc* ]]; then
+  _srcname=linux-${pkgver/rc/-rc}
+  _srcurl=https://git.kernel.org/torvalds/t/$_srcname.tar.gz
+else
+  _srcname=linux-$pkgver
+  _srcurl=https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/$_srcname.tar.xz
+fi
+
 source=(
-  https://git.kernel.org/torvalds/t/$_srcname.tar.gz
+  "$_srcurl"
   config
   0001-drm-xe-lnl-ggtt-forcewake-dpt-no-stolen.patch
   0002-dell-wmi-ignore-0012-0000.patch
