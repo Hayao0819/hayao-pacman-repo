@@ -31,13 +31,13 @@ fi
 source=(
   "$_srcurl"
   config
-  0001-drm-xe-lnl-ggtt-forcewake-dpt-no-stolen.patch
+  0001-drm-xe-lnl-ggtt-forcewake.patch
   0002-dell-wmi-ignore-0012-0000.patch
   0003-ucsi-retry-notification-reenable-after-resume.patch
 )
 sha256sums=('f9fef3d14c0df53819026f4be74459835c2a0b0dcbf5b5bbd9ea19f0829402b3'
             '307435900d8590c57e2928ffce97155fdc9609becb776b48daf22de1087339b5'
-            '5b08d204a811bfeb496203d33c752ac33ef7eeaed7bb99739faa7d026fc50539'
+            '2a6aa3a4c0c996c5c701c2769a00d941d628d7ddb8f77c8a1d49861a6de4cc5e'
             '1f9448013aa334c8696b443bf2efb9e450c1bb217cfac1486759b3715faad129'
             'ab288dda48259b230f00af4d84be4e551aaf778a5a99ca6fcbf6ac5404a213cc')
 
