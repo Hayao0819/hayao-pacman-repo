@@ -16,3 +16,12 @@
 [submodule "hayao/gtk2"]
 	path = hayao/gtk2
 	url = https://aur.archlinux.org/gtk2
+[submodule "hayao/migrate"]
+	path = hayao/migrate
+	url = https://aur.archlinux.org/migrate
+[submodule "hayao/miraktest"]
+	path = hayao/miraktest
+	url = https://aur.archlinux.org/miraktest
+[submodule "hayao/treefmt"]
+	path = hayao/treefmt
+	url = https://aur.archlinux.org/treefmt
