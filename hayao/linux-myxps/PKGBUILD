@@ -1,7 +1,7 @@
 # Maintainer: hayao <shun819.mail@gmail.com>
 
 pkgbase=linux-myxps
-pkgver=7.2.2
+pkgver=7.2.3
 pkgrel=1
 pkgdesc='Linux mainline with Dell XPS 13 9350 (2024, Lunar Lake) fixes'
 url='https://github.com/Hayao0819/hayao-pacman-repo'
@@ -35,7 +35,7 @@ source=(
   0002-dell-wmi-ignore-0012-0000.patch
   0003-ucsi-retry-notification-reenable-after-resume.patch
 )
-sha256sums=('7d0e7ce14f98c43efe880cffbf354a59be45928fdf7170d7333c374ae91c0d83'
+sha256sums=('8ba259e8e7b13ec6ef0941c8a39ad90b24bd4a4d6c0010ba6bafb794550ecd03'
             '307435900d8590c57e2928ffce97155fdc9609becb776b48daf22de1087339b5'
             '2a6aa3a4c0c996c5c701c2769a00d941d628d7ddb8f77c8a1d49861a6de4cc5e'
             '1f9448013aa334c8696b443bf2efb9e450c1bb217cfac1486759b3715faad129'
