@@ -2,7 +2,7 @@
 
 pkgbase=linux-myxps
 pkgver=7.2.4
-pkgrel=1
+pkgrel=2
 pkgdesc='Linux mainline with Dell XPS 13 9350 (2024, Lunar Lake) fixes'
 url='https://github.com/Hayao0819/hayao-pacman-repo'
 arch=(x86_64)
@@ -117,6 +117,11 @@ _package-headers() {
 
   # required when STACK_VALIDATION is enabled
   install -Dt "$builddir/tools/objtool" tools/objtool/objtool
+
+  # required when DEBUG_INFO_BTF_MODULES is enabled
+  if [[ $(scripts/config -s CONFIG_DEBUG_INFO_BTF_MODULES) = y ]]; then
+    install -Dt "$builddir/tools/bpf/resolve_btfids" tools/bpf/resolve_btfids/resolve_btfids
+  fi
 
   echo "Installing headers..."
   cp -t "$builddir" -a include

@@ -1,7 +1,7 @@
 pkgbase = linux-myxps
 	pkgdesc = Linux mainline with Dell XPS 13 9350 (2024, Lunar Lake) fixes
 	pkgver = 7.2.4
-	pkgrel = 1
+	pkgrel = 2
 	url = https://github.com/Hayao0819/hayao-pacman-repo
 	arch = x86_64
 	license = GPL-2.0-only
