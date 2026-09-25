@@ -1,6 +1,6 @@
 [linux-myxps]
 source = "regex"
 url = "https://www.kernel.org/releases.json"
-regex = '"version": *"(7\.2(?:[.-][^"]*)?)"'
+regex = '"version": *"(7\.3(?:[.-][^"]*)?)"'
 from_pattern = "-rc"
 to_pattern = "rc"
