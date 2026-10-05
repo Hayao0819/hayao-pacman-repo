@@ -1,7 +1,7 @@
 # Maintainer: hayao <shun819.mail@gmail.com>
 
 pkgbase=linux-myxps
-pkgver=7.3rc5
+pkgver=7.3rc6
 pkgrel=1
 pkgdesc='Linux mainline with Dell XPS 13 9350 (2024, Lunar Lake) fixes and BORE'
 url='https://github.com/Hayao0819/hayao-pacman-repo'
@@ -47,7 +47,7 @@ source=(
   0004-bore.patch
 )
 source_x86_64=(config.x86_64)
-sha256sums=('382d6aa48640351df7da6321e156c39155b4a99b0985d4370f7e608729987453'
+sha256sums=('7775777e3fc191e3e84d8972c94777fa58e6ee56b52ed131a42ed1d0e14f52e9'
             '2a6aa3a4c0c996c5c701c2769a00d941d628d7ddb8f77c8a1d49861a6de4cc5e'
             '1f9448013aa334c8696b443bf2efb9e450c1bb217cfac1486759b3715faad129'
             'ab288dda48259b230f00af4d84be4e551aaf778a5a99ca6fcbf6ac5404a213cc'
